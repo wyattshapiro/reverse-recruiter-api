@@ -37,13 +37,8 @@ class Predict(Resource):
 
 
 if __name__ == '__main__':
-    try:
-        port = 5000
-    except:
-        port = 12345
-
     # download model
     classifier_util.download_model()
 
     # run flask app
-    app.run(port=port, debug=True)
+    app.run(port=5000, debug=True)
