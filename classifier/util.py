@@ -4,9 +4,9 @@ import pickle
 import string
 import re
 
-CHOSEN_MODEL = 'RidgeClassifier-TfidfVectorizer'
-CHOSEN_VECTORIZER_PATH = 'classifier/models/{}/{}'.format(CHOSEN_MODEL, 'vectorizer.pkl')
-CHOSEN_CLASSIFIER_PATH = 'classifier/models/{}/{}'.format(CHOSEN_MODEL, 'classifier.pkl')
+MODEL = 'RidgeClassifier-TfidfVectorizer'
+VECTORIZER_PATH = 'classifier/models/{}/{}'.format(MODEL, 'vectorizer.pkl')
+CLASSIFIER_PATH = 'classifier/models/{}/{}'.format(MODEL, 'classifier.pkl')
 
 
 def preprocess_message(message):
@@ -43,26 +43,26 @@ def preprocess_message(message):
     return preprocessed_message
 
 
-def is_recruiter(message):
+def is_recruiter(message, vectorizer, classifier):
     # clean and vectorize this message
     message_clean = preprocess_message(message)
-    message_vectorized = CHOSEN_VECTORIZER.transform([message_clean]).toarray()
+    message_vectorized = vectorizer.transform([message_clean]).toarray()
 
     # predict if message is from a recruiter
-    prediction = CHOSEN_CLASSIFIER.predict(message_vectorized)
+    prediction = classifier.predict(message_vectorized)
 
     return prediction[0]
 
 
 def download_model():
-    # download stop words onto server
-    nltk.download('stopwords')
+    try:
+        # read in model
+        vectorizer = pickle.load(open(VECTORIZER_PATH, "rb"))   
+        classifier = pickle.load(open(CLASSIFIER_PATH, "rb"))
+    except:
+        return None, None
 
-    # read in model
-    global CHOSEN_VECTORIZER 
-    CHOSEN_VECTORIZER= pickle.load(open(CHOSEN_VECTORIZER_PATH, "rb"))
-    global CHOSEN_CLASSIFIER 
-    CHOSEN_CLASSIFIER = pickle.load(open(CHOSEN_CLASSIFIER_PATH, "rb"))
+    return vectorizer, classifier
 
 
 if __name__ == '__main__':
