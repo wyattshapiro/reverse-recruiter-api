@@ -1,12 +1,9 @@
 # Dependencies
 from flask import Flask, request
 from flask_restx import Api, Resource, fields
-import pickle
 import traceback
+import classifier.util as classifier_util
 
-CHOSEN_MODEL = 'RidgeClassifier-TfidfVectorizer'
-CHOSEN_VECTORIZER_PATH = 'classifier/models/{}/{}'.format(CHOSEN_MODEL, 'vectorizer.pkl')
-CHOSEN_CLASSIFIER_PATH = 'classifier/models/{}/{}'.format(CHOSEN_MODEL, 'classifier.pkl')
 
 app = Flask(__name__)
 api = Api(app, version='1.0', title='ReverseRecruiter API',
@@ -17,18 +14,25 @@ ns = api.namespace('reverseRecruiter')
 
 
 @ns.route('/predict')
+@ns.doc(params={'message': {'in': 'query', 'type': 'string'}})
 class Predict(Resource):
     
     def post(self):
-        if chosen_vectorizer and chosen_classifier:
-            try:
-                return {'prediction': str('0')}
+        # check if models are loaded on server
+        # if chosen_vectorizer and chosen_classifier:
+        try:
+            # parse request
+            message = str(request.args.get('message'))
+            
+            # predict if message is from a recruiter
+            prediction = classifier_util.is_recruiter(message)
 
-            except:
-                return {'trace': traceback.format_exc()}
-        else:
-            print ('Train the model first')
-            return ('No model here to use')
+            return {'is_success': True, 'error': None, 'is_recruiter': str(prediction)}
+
+        except:
+            return {'is_success': False, 'error': traceback.format_exc(), 'prediction': None}
+        # else:
+        #     return {'is_success': False, 'error': 'Model not loaded', 'prediction': None}
 
 
 
@@ -38,9 +42,8 @@ if __name__ == '__main__':
     except:
         port = 12345
 
-    # read in model
-    chosen_vectorizer = pickle.load(open(CHOSEN_VECTORIZER_PATH, "rb"))
-    chosen_classifier = pickle.load(open(CHOSEN_CLASSIFIER_PATH, "rb"))
+    # download model
+    classifier_util.download_model()
 
-    # run app
+    # run flask app
     app.run(port=port, debug=True)
