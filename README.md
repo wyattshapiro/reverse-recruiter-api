@@ -23,7 +23,7 @@ This project has the following key dependencies:
 
 - The private dataset used for training and testing is a set of 600 real emails sent to me and frequent collaborator, Andres Tavio.
 - Each email was manually labeled as either a recruiter or not.
-- RigdeClassifier-TfidfVectorizer was chosen as it was the high performing model that was tested.
+- RigdeClassifier-TfidfVectorizer was chosen as it was one of the highest performing models that was tested.
 
 
 ## Quickstart
