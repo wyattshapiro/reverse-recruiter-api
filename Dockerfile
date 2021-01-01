@@ -11,5 +11,5 @@ RUN python3 -m nltk.downloader stopwords
 COPY ./app /app
 WORKDIR /app/
 
-EXPOSE 8000
-CMD ["uvicorn", "--host", "0.0.0.0", "--port", "8000", "main:app", "--reload"]
+EXPOSE 80
+CMD ["uvicorn", "--host", "0.0.0.0", "--port", "80", "main:app"]
